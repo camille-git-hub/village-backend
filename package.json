@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.3.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
+  },
+  "imports": {
+    "#models": "./src/models/index.ts",
+    "#controllers": "./src/controllers/index.ts",
+    "#routes": "./src/routes/index.ts",
+    "#types": "./src/types/index.ts"
+  }
+}
