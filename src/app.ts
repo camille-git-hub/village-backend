@@ -1,9 +1,12 @@
 import '#db';
 import express from 'express';
 //import { userRoutes } from './routes/index.ts';
+import cors from 'cors';
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
+
+app.use(cors({ origin: process.env.CORS_ORIGIN, exposedHeaders: ['WWW-Authenticate'] }));
 
 app.use(express.json());
 //app.use('/users', userRoutes);

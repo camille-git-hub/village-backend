@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'express';
-import type { UserType } from '#types';
-import { User } from '#models';
+import type { UserType } from '../types/index.ts';
+import { User } from '../models/index.ts';
+
 
 export const getAllUsers: RequestHandler = async (req, res) => {
     try {
