@@ -1,5 +1,5 @@
 {
-  "name": "wbs-travel-journal-api",
+  "name": "village-backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,8 @@
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "prestart": "npm run build",
-    "start": "node --env-file=.env.production.local dist/app.js"
+    "start": "node --env-file=.env.production.local dist/app.js",
+    "lint": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
@@ -17,14 +18,17 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.4",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.3",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.12.0",
     "dotenv": "^17.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3"
   },
   "imports": {
