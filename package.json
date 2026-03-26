@@ -2,23 +2,24 @@
   "name": "village-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "dist/app.js",
   "type": "module",
   "scripts": {
     "dev": "node --watch --conditions development --env-file=.env.development.local src/app.ts",
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "prestart": "npm run build",
-    "start": "node --env-file=.env.production.local dist/app.js",
-    "lint": "tsc --noEmit"
+    "start": "node dist/app.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^7.1.1",
     "mongoose": "^8.16.4",
     "zod": "^4.3.6"
   },
