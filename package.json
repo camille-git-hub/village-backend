@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch --conditions development --env-file=.env.development.local src/app.ts",
+    "dev": "tsx --watch --conditions development --env-file=.env.development.local src/app.ts",
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "prestart": "npm run build",
