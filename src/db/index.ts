@@ -1,11 +1,17 @@
 import mongoose from 'mongoose';
 
-try {
+export async function connectDB() {
   const mongoURI = process.env.MONGO_URI;
-  if (!mongoURI) throw new Error('No Mongo DB Connection String present');
-  const client = await mongoose.connect(mongoURI, { dbName: 'village' });
-  console.log(`Connected to MongoDB @ ${client.connection.host} - ${client.connection.name}`);
-} catch (error) {
-  console.log(error);
-  process.exit(1);
+
+  if (!mongoURI) {
+    throw new Error('No Mongo DB Connection String present');
+  }
+
+  const client = await mongoose.connect(mongoURI, {
+    dbName: process.env.DB_NAME || 'village',
+  });
+
+  console.log(
+    `Connected to MongoDB @ ${client.connection.host} - ${client.connection.name}`
+  );
 }
