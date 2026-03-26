@@ -31,6 +31,9 @@
     "dotenv": "^17.2.0",
     "typescript": "^5.8.3"
   },
+  "engines": {
+  "node": "20.x"
+  },
   "imports": {
     "#controllers": {
       "development": "./src/controllers/index.ts",
