@@ -3,6 +3,35 @@
   "version": "1.0.0",
   "main": "app.js",
   "type": "module",
+  "scripts": {
+    "dev": "node --watch --conditions development --experimental-transform-types --disable-warning=ExperimentalWarning --env-file=.env src/app.ts",
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "node dist/app.js"
+  },
+  "engines": {
+  "node": "20.x"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.16.5",
+    "dotenv": "17.3.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.1.0",
+    "typescript": "^5.8.3",
+    "zod": "^4.0.10"
+  },
   "imports": {
     "#controllers": {
       "development": "./src/controllers/index.ts",
@@ -36,32 +65,5 @@
       "development": "./src/utils/index.ts",
       "default": "./dist/utils/index.js"
     }
-  },
-  "scripts": {
-    "dev": "node --watch --conditions development --experimental-transform-types --disable-warning=ExperimentalWarning --env-file=.env src/app.ts",
-    "prebuild": "rm -rf dist",
-    "build": "tsc",
-    "prestart": "npm run build",
-    "start": "node dist/app.js"
-  },
-  "dependencies": {
-    "bcrypt": "^6.0.0",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.16.5",
-    "dotenv": "17.3.1"
-
-  },
-  "devDependencies": {
-    "@types/bcrypt": "^6.0.0",
-    "@types/cookie-parser": "^1.4.9",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.3",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^24.1.0",
-    "typescript": "^5.8.3",
-    "zod": "^4.0.10"
   }
 }
