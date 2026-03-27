@@ -3,7 +3,9 @@ import express from 'express';
 //import { userRoutes } from './routes/index.ts';
 import cors from 'cors';
 import { connectDB } from './db/index.ts';
+import mongoose from 'mongoose';
 
+console.log("Mongoose version:", mongoose.version);
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -24,6 +26,7 @@ async function start() {
         console.log("ENV CHECK:", {
         mongo: process.env.MONGO_URI ? "exists" : "missing",
         nodeEnv: process.env.NODE_ENV
+        
     });
         await connectDB();
         app.listen(port, () => {
