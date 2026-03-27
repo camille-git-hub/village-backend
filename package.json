@@ -11,6 +11,9 @@
     "prestart": "npm run build",
     "start": "node --env-file=.env dist/app.js"
   },
+  "engines": {
+  "node": "20.x"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
