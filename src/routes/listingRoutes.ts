@@ -9,10 +9,9 @@ listingRoutes.get("/", getAllListings);
 
 listingRoutes.post("/", verifyToken, createListing);
 
-listingRoutes.get("/:id", getListingById);
+listingRoutes.get("/:_id", getListingById);
 
-listingRoutes.put("/:id", verifyToken, updateListing);
+listingRoutes.put("/:_id", verifyToken, updateListing);
 
-listingRoutes.delete("/:id", verifyToken, deleteListing);
-
+listingRoutes.delete("/:_id", verifyToken, deleteListing);
 export default listingRoutes;
