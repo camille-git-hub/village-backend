@@ -61,8 +61,8 @@ export const createListing: RequestHandler = async (req, res, next) => {
 
 export const getListingById: RequestHandler = async (req, res, next) => {
     try {
-        const { id } = req.params;
-        const listing = await Listing.findById(id).populate('ownerId', 'email firstName lastName');
+        const { _id } = req.params;
+        const listing = await Listing.findById(_id).populate('ownerId', 'email firstName lastName');
         if (!listing) {
             return res.status(404).json({ message: "Listing not found" });
         }
