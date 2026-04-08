@@ -142,4 +142,4 @@ export const deleteListing: RequestHandler = async (req, res, next) => {
     }
 };
 
-export default { getAllListings, createListing, getListingById, updateListing, deleteListing };
+export default { getAllListings, createListing, getListingById, updateListing, deleteListing, getListingByOwnerId };
