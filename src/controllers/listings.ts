@@ -71,6 +71,16 @@ export const getListingById: RequestHandler = async (req, res, next) => {
     }
 };
 
+export const getListingByOwnerId: RequestHandler = async (req, res, next) => {
+    try {
+        const { ownerId } = req.params;
+        const listings = await Listing.find({ ownerId }).populate('ownerId', 'email firstName lastName');
+        res.status(200).json({ message: "Get listings by owner ID", data: listings });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const updateListing: RequestHandler = async (req, res, next) => {
     try {
         const { _id } = req.params;

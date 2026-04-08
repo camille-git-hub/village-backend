@@ -46,4 +46,6 @@ const listingSchema = new Schema(
         }
 );
 
+listingSchema.index({ title: 'text', description: 'text', category: 'text' });
+
 export default model('Listing', listingSchema);
