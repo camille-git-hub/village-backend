@@ -14,4 +14,5 @@ listingRoutes.get("/:_id", getListingById);
 listingRoutes.put("/:_id", verifyToken, updateListing);
 
 listingRoutes.delete("/:_id", verifyToken, deleteListing);
+
 export default listingRoutes;

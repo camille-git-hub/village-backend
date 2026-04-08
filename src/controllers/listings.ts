@@ -1,4 +1,3 @@
-import { get } from "http";
 import Listing from "../models/Listing.ts";
 import type { RequestHandler } from "express";
 import { getCoordinatesFromNeighborhood, HAMBURG_NEIGHBORHOODS } from "./../utils/neightborhoods.ts";
@@ -6,7 +5,7 @@ import { getCoordinatesFromNeighborhood, HAMBURG_NEIGHBORHOODS } from "./../util
 
 export const getAllListings: RequestHandler = async (req, res, next) => {
     try {
-        const { category, neighborhood, search } = req.query;
+        const { category, neighborhood, q } = req.query;
         
         const filter: any = {};
         if (category) {
@@ -15,8 +14,8 @@ export const getAllListings: RequestHandler = async (req, res, next) => {
         if (neighborhood) {
         filter.neighborhood = neighborhood;
          }
-        if (search) {
-        filter.$text = { $search: search };
+        if (q) {
+        filter.$text = { $search: q };
         }
         
         const listings = await Listing.find(filter)
@@ -74,10 +73,10 @@ export const getListingById: RequestHandler = async (req, res, next) => {
 
 export const updateListing: RequestHandler = async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const { _id } = req.params;
         const { title, category, description, neighborhood, city, lat, lng } = req.body;
 
-        const listing = await Listing.findById(id);
+        const listing = await Listing.findById(_id);
         if (!listing) {
             return res.status(404).json({ message: "Listing not found" });
         }
@@ -114,9 +113,9 @@ export const updateListing: RequestHandler = async (req, res, next) => {
 
 export const deleteListing: RequestHandler = async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const { _id } = req.params;
 
-        const listing = await Listing.findById(id);
+        const listing = await Listing.findById(_id);
         if (!listing) {
             return res.status(404).json({ message: "Listing not found" });
         }
@@ -125,7 +124,7 @@ export const deleteListing: RequestHandler = async (req, res, next) => {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
-        await Listing.findByIdAndDelete(id);
+        await Listing.findByIdAndDelete(_id);
 
         res.status(200).json({ message: "Listing deleted successfully" });
     } catch (error) {
