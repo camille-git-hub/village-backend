@@ -1,6 +1,45 @@
 import Listing from "../models/Listing.ts";
-import type { RequestHandler } from "express";
+import { response, type RequestHandler } from "express";
 import { getCoordinatesFromNeighborhood, HAMBURG_NEIGHBORHOODS } from "./../utils/neightborhoods.ts";
+import axios from "axios";
+
+export const searchAddress: RequestHandler = async (req, res, next) => {
+    try {
+        const { query } = req.query;
+
+        console.log('Received address search query:', query);
+        
+        if (!query || typeof query !== 'string' || query.length < 3) {
+            console.log('Invalid query for address search:', query);
+            return res.json([]);
+        }
+
+            try {
+                console.log("Calling OpenStreetMap API");
+                const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+            params: {
+                q: `${query}, Hamburg, Germany`,
+                format: 'json',
+                countrycodes: 'de',
+                limit: 10,
+            },
+            headers: {
+                'User-Agent': 'village-app',
+
+            },
+            timeout: 5000,
+        });
+        console.log('OpenStreetMap API response:', response.data);
+        res.json(response.data);
+        } catch (axiosError) {
+            console.error('Error calling OpenStreetMap API:', axiosError);
+            res.status(500).json({ message: 'Error fetching address suggestions' });
+        }
+    } catch (error) {
+        console.error('Geocoding error:', error);
+        res.status(500).json({ message: 'Error searching addresses' });
+    }
+};
 
 
 export const getAllListings: RequestHandler = async (req, res, next) => {
@@ -30,26 +69,30 @@ export const getAllListings: RequestHandler = async (req, res, next) => {
 
 export const createListing: RequestHandler = async (req, res, next) => {
     try {
-        const { title, category, description, neighborhood, city, lat, lng } = req.body;
+        const { title, category, description, neighborhood, lat, lng, address } = req.body;
 
-        if (!title || !category || !description || !neighborhood || !city) {
+        if (!title || !category || !description || !neighborhood ) {
             return res.status(400).json({ message: "Missing required fields" });
+        }
+
+        if (lat === null || lng === null || lng === undefined || lat === undefined) {
+            return res.status(400).json({ message: "Latitude and longitude are required. Please select an address from the suggestions." });
         }
 
         const coords = getCoordinatesFromNeighborhood(neighborhood);
         if (!coords) {
             return res.status(400).json({ message: "Invalid neighborhood: please select a valid neighborhood from this list: " + Object.keys(HAMBURG_NEIGHBORHOODS).join(", ") });
-        }
+        } 
 
         const newListing = await Listing.create({
             title,
             category,
             description,
             neighborhood,
-            city,
+            address: address || '',
             lat: lat || 0,
             lng: lng || 0,
-            ownerId: req.user.id
+            ownerId: req.user._id
         });
 
         res.status(201).json({ message: "Listing created successfully", data: newListing });
@@ -84,30 +127,28 @@ export const getListingByOwnerId: RequestHandler = async (req, res, next) => {
 export const updateListing: RequestHandler = async (req, res, next) => {
     try {
         const { _id } = req.params;
-        const { title, category, description, neighborhood, city, lat, lng } = req.body;
+        const { title, category, description, neighborhood, address, lat, lng } = req.body;
 
         const listing = await Listing.findById(_id);
         if (!listing) {
             return res.status(404).json({ message: "Listing not found" });
         }
 
-        if (listing.ownerId.toString() !== req.user.id) {
+        if (listing.ownerId.toString() !== req.user._id) {
             return res.status(403).json({ message: "Unauthorized" });
         }
 
         if (title) listing.title = title;
         if (category) listing.category = category;
         if (description) listing.description = description;
-        if (city) listing.city = city;
+        if (address !== undefined) listing.address = address;
 
-        if (neighborhood && neighborhood !== listing.neighborhood) {
+        if (neighborhood) {
             const coords = getCoordinatesFromNeighborhood(neighborhood);
             if (!coords) {
                 return res.status(400).json({ message: "Invalid neighborhood: please select a valid neighborhood from this list: " + Object.keys(HAMBURG_NEIGHBORHOODS).join(", ") });
             }
             listing.neighborhood = neighborhood;
-            listing.lat = coords.lat;
-            listing.lng = coords.lng;
         }
 
         if (lat !== undefined) listing.lat = lat;
@@ -130,7 +171,7 @@ export const deleteListing: RequestHandler = async (req, res, next) => {
             return res.status(404).json({ message: "Listing not found" });
         }
 
-        if (listing.ownerId.toString() !== req.user.id) {
+        if (listing.ownerId.toString() !== req.user._id) {
             return res.status(403).json({ message: "Unauthorized" });
         }
 

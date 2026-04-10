@@ -13,7 +13,12 @@ console.log("Mongoose version:", mongoose.version);
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors({ origin: process.env.CORS_ORIGIN, exposedHeaders: ['WWW-Authenticate'] }));
+app.use(cors({ 
+    origin: process.env.CORS_ORIGIN, 
+    exposedHeaders: ['WWW-Authenticate'],
+    credentials: true
+}));
+
 app.use(express.json(), cookieParser());
 
 app.use('/listings', listingRoutes);

@@ -22,11 +22,6 @@ const listingSchema = new Schema(
             required: [true, 'Neighborhood is required'],
             trim: true
         },
-        city: {
-            type: String,
-            required: [true, 'City is required'],
-            trim: true  
-        },
         lat: {
             type: Number,
             default: null
@@ -39,6 +34,10 @@ const listingSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: [true, 'Owner ID is required']
+        },
+        address: {
+            type: String,
+            default: ''
         },
     },
     {

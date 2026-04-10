@@ -4,7 +4,7 @@ import type { RequestHandler } from 'express';
 declare global {
   namespace Express {
     interface Request {
-      user: { id: string; email: string };
+      user: { _id: string; email: string };
     }
   }
 }
@@ -18,9 +18,9 @@ export const verifyToken: RequestHandler = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(accessToken, secret) as jwt.JwtPayload;
-    const { id, email} = decoded;
+    const { _id, email} = decoded;
 
-    req.user = { id, email };
+    req.user = { _id, email };
     next();
 
   } catch (error) {
