@@ -1,7 +1,6 @@
 import type { RequestHandler } from "express";
-import { Chat, User } from '../models/index.ts';
-import type Chat from '../types/chat.ts';
-import type User from '../types/user.ts';
+import { Chat } from '../models/index.ts';
+import { User } from '../models/index.ts';
 
   const getChats: RequestHandler = async (req, res, next) => {
       try {
@@ -46,7 +45,8 @@ import type User from '../types/user.ts';
         try {
             const userId = req.user._id;
             const { participantId } = req.body;
-
+            const { chatId } = req.params;
+          
             if (!participantId) {
                 return res.status(400).json({ message: "Participant ID is required" });
             }
@@ -65,9 +65,9 @@ import type User from '../types/user.ts';
             }).populate('participantIds', 'email firstName lastName');
 
             if (!chat) {
-                chat = await Chat.create({participantIds: [userId, participantId], messages: []} );
+                chat = await Chat.create({participantIds: [userId, participantId], messages: []} ) as any;
 
-                chat = await Chat.populate('participantIds', 'email firstName lastName');
+                chat = await Chat.findById(chatId).populate('participantIds', 'email firstName lastName');
                 }
 
             res.status(201).json({ message: "Chat created successfully", data: chat });
@@ -80,6 +80,7 @@ import type User from '../types/user.ts';
   const sendMessage: RequestHandler = async (req, res, next) => {
         try {
             const userId = req.user._id;
+            const userName = `${req.user.firstName} ${req.user.lastName}`;
             const { chatId } = req.params;
             const { content } = req.body;
 
@@ -101,7 +102,7 @@ import type User from '../types/user.ts';
 
             const newMessage = {
                 senderId: userId,
-                senderName: `${req.user.firstName} ${req.user.lastName}`,
+                senderName: userName,
                 content: content.trim(),
                 createdAt: new Date(),
                 read: false
@@ -123,6 +124,7 @@ import type User from '../types/user.ts';
         
             const { chatId } = req.params;
             const chat = await Chat.findById(chatId);
+            const userId = req.user._id;
 
             if (!chat) {
                 return res.status(404).json({ message: "Chat not found" });
@@ -134,7 +136,7 @@ import type User from '../types/user.ts';
                 return res.status(403).json({ message: "Unauthorized" });
             }
 
-            chat.messages.forEach((message) => {
+            chat.messages.forEach((message: any) => {
                 if (!message.read) {
                     message.read = true;
                 }

@@ -1,5 +1,5 @@
 import {model, Schema} from 'mongoose';
-import messageSchema from './Message.ts';
+import { messageSchema } from './Message.ts';
 
 const chatSchema = new Schema(
     {   
