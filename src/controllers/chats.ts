@@ -1,6 +1,7 @@
-import { response, type RequestHandler } from "express";
-import Chat from "../models/Chat.ts";
-import User from "../models/User.ts";
+import type { RequestHandler } from "express";
+import { Chat, User } from '../models/index.ts';
+import type Chat from '../types/chat.ts';
+import type User from '../types/user.ts';
 
   const getChats: RequestHandler = async (req, res, next) => {
       try {
@@ -21,7 +22,7 @@ import User from "../models/User.ts";
             const userId = req.user._id;
             const { chatId } = req.params;
 
-            const chat = await Chat.findOne({ _id: chatId, participantIds: userId })
+            const chat = await Chat.findById(chatId)
                 .populate('participantIds', 'email firstName lastName');
 
           if (!chat) {
@@ -31,7 +32,7 @@ import User from "../models/User.ts";
           const isParticipant = chat.participantIds.some((id: any) => id._id.toString() === userId.toString());
 
           if (!isParticipant) {
-                return res.status(403).json({ message: "Unauthorized" });
+                return res.status(403).json({ message: "Unauthorized access" });
           }
 
           res.status(200).json({ message: "Chat found", data: chat });
@@ -54,7 +55,7 @@ import User from "../models/User.ts";
                 return res.status(400).json({ message: "Cannot create chat with yourself" });
             }
 
-            const participantExists = await User.exists({ _id: participantId });
+            const participantExists = await User.findById(participantId);
             if (!participantExists) {
                 return res.status(404).json({ message: "Participant user not found" });
             }
@@ -64,9 +65,9 @@ import User from "../models/User.ts";
             }).populate('participantIds', 'email firstName lastName');
 
             if (!chat) {
-                chat = await Chat.create({ participantIds: [userId, participantId], messages: [] });
+                chat = await Chat.create({participantIds: [userId, participantId], messages: []} );
 
-                chat = await chat.populate('participantIds', 'email firstName lastName');
+                chat = await Chat.populate('participantIds', 'email firstName lastName');
                 }
 
             res.status(201).json({ message: "Chat created successfully", data: chat });
@@ -86,7 +87,7 @@ import User from "../models/User.ts";
                 return res.status(400).json({ message: "Message content is required" });
             }
 
-            const chat = await Chat.findOne(chatId);
+            const chat = await Chat.findById(chatId);
             
             if (!chat) {
                 return res.status(404).json({ message: "Chat not found" });
@@ -95,12 +96,12 @@ import User from "../models/User.ts";
             const isParticipant = chat.participantIds.some((id: any) => id.toString() === userId.toString());
 
             if (!isParticipant) {
-                return res.status(403).json({ message: "Unauthorized" });
+                return res.status(403).json({ message: "Unauthorized access" });
             }
 
             const newMessage = {
                 senderId: userId,
-                senderName: req.user.firstName + " " + req.user.lastName,
+                senderName: `${req.user.firstName} ${req.user.lastName}`,
                 content: content.trim(),
                 createdAt: new Date(),
                 read: false
@@ -119,8 +120,9 @@ import User from "../models/User.ts";
 
   const markAsRead: RequestHandler = async (req, res, next) => {
         try {
-            const chat = await Chat.findById(chatId);
+        
             const { chatId } = req.params;
+            const chat = await Chat.findById(chatId);
 
             if (!chat) {
                 return res.status(404).json({ message: "Chat not found" });
@@ -133,8 +135,8 @@ import User from "../models/User.ts";
             }
 
             chat.messages.forEach((message) => {
-                if (!msg.read) {
-                    msg.read = true;
+                if (!message.read) {
+                    message.read = true;
                 }
             });
 
