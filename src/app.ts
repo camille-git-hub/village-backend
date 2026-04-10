@@ -1,17 +1,23 @@
 import 'dotenv/config';
 import express from 'express';
-//import { userRoutes } from './routes/index.ts';
 import cors from 'cors';
 import { connectDB } from './db/index.ts';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import listingRoutes from './routes/listingRoutes.ts';
+import chatRoutes from './routes/chatRoutes.ts';
+import http from 'http';
 import { errorHandler, notFoundHandler } from '#middleware';
+import { initializeSocket } from './services/socketService.ts';
+
 
 console.log("Mongoose version:", mongoose.version);
 
 const app = express();
 const port = process.env.PORT || 3000;
+const httpServer = http.createServer(app);
+
+const io = initializeSocket(httpServer);
 
 app.use(cors({ 
     origin: process.env.CORS_ORIGIN, 
@@ -22,6 +28,7 @@ app.use(cors({
 app.use(express.json(), cookieParser());
 
 app.use('/listings', listingRoutes);
+app.use('/chats', chatRoutes);
 
 app.get('/', (req, res) => {
     res.json({

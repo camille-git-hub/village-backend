@@ -1,0 +1,78 @@
+import { Server as HHTPServer } from 'http';
+import { Server as SocketIOServer, Socket } from 'socket.io';
+
+type UserSocket = {
+    userId: string;
+    socket: Socket;
+};
+
+const userSockets: Map<string, string> = new Map();
+
+export const initializeSocket = (httpServer: HHTPServer) => {
+    const io = new SocketIOServer(httpServer, {
+        cors: {
+            origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+            credentials: true,
+        },
+    });
+
+
+io.on('connection', (socket: Socket) => {
+    console.log(`A user connected: ${socket.id}`);
+    socket.on('user:register', (userId: string) => {
+        userSockets.set(userId, socket.id);
+        console.log(`Registered user ${userId} with socket ${socket.id}`);
+    });
+
+    socket.on('message:send', (data) => {
+        const { chatId, recipientId, message } = data; 
+        const recipientSocketId = userSockets.get(recipientId);
+
+        if (recipientSocketId) {
+            io.to(recipientSocketId).emit('message:receive', { chatId, message });
+            console.log(`Sent message to user ${recipientId} in chat ${chatId}`);
+
+        }
+
+            socket.emit('message:sent', { chatId, message });
+        
+        });
+
+        socket.on('typing:start', (data) => {
+            const { chatId, recipientId, senderName } = data;
+            const recipientSocketId = userSockets.get(recipientId);
+
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit('typing:started', { chatId, senderName });
+                console.log(`User ${senderName} started typing in chat ${chatId}`);
+            }
+        });
+
+        socket.on('typing:stop', (data) => {
+            const { chatId, recipientId } = data;
+            const recipientSocketId = userSockets.get(recipientId);
+
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit('typing:stopped', { chatId});
+                console.log(`User stopped typing in chat ${chatId}`);
+            }
+        });
+
+        socket.on('disconnect', () => {
+            for (const [userId, socketId] of userSockets.entries()) {
+                if (socketId === socket.id) {
+                    userSockets.delete(userId);
+                    console.log(`User ${userId} disconnected and removed from userSockets`);
+                    break;
+                }
+            }
+        });
+    });
+
+    return io;
+
+};
+
+export { userSockets };
+
+           

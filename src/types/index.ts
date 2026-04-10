@@ -1,8 +1,4 @@
-export type UserType = {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    isActive?: boolean;
-};
-
+export type { User } from './user.ts';
+export type { Message } from './message.ts';
+export type { Chat } from './chat.ts';
+export type { Listing } from './listing.ts';
