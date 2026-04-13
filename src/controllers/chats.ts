@@ -45,7 +45,7 @@ import { User } from '../models/index.ts';
         try {
             const userId = req.user._id;
             const { participantId } = req.body;
-            const { chatId } = req.params;
+            //const { chatId } = req.params;
           
             if (!participantId) {
                 return res.status(400).json({ message: "Participant ID is required" });
@@ -67,7 +67,7 @@ import { User } from '../models/index.ts';
             if (!chat) {
                 chat = await Chat.create({participantIds: [userId, participantId], messages: []} ) as any;
 
-                chat = await Chat.findById(chatId).populate('participantIds', 'email firstName lastName');
+                chat = await Chat.findById(chat!._id).populate('participantIds', 'email firstName lastName');
                 }
 
             res.status(201).json({ message: "Chat created successfully", data: chat });
@@ -152,4 +152,28 @@ import { User } from '../models/index.ts';
     
   };
 
-export { getChats, getChatById, createOrGetChat, sendMessage, markAsRead };
+  const deleteChat: RequestHandler = async (req, res, next) => {
+        try {
+            const { chatId } = req.params;
+            const userId = req.user._id;
+            
+            const chat = await Chat.findById(chatId);
+
+            if (!chat) {
+                return res.status(404).json({ message: "Chat not found" });
+            }
+
+            const isParticipant = chat.participantIds.some((id: any) => id.toString() === userId.toString());
+
+            if (!isParticipant) {
+                return res.status(403).json({ message: "Unauthorized" });
+            }
+
+            await Chat.findByIdAndDelete(chatId);
+            res.status(200).json({ message: "Chat deleted successfully" });
+        } catch (error) {
+            next(error);
+        }
+  };
+
+export { getChats, getChatById, createOrGetChat, sendMessage, markAsRead, deleteChat };

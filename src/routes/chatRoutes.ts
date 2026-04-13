@@ -1,6 +1,6 @@
 // src/routes/chatRoutes.ts
 import { Router } from 'express';
-import { getChats, getChatById, createOrGetChat, sendMessage, markAsRead } from '../controllers/chats.ts';
+import { getChats, getChatById, createOrGetChat, sendMessage, markAsRead, deleteChat } from '../controllers/chats.ts';
 import { verifyToken } from '#middleware';
 
 const chatRoutes = Router();
@@ -22,5 +22,7 @@ chatRoutes.post('/:chatId/messages', sendMessage);
 
 // Mark all messages in a chat as read
 chatRoutes.put('/:chatId/read', markAsRead);
+
+chatRoutes.delete('/:chatId', deleteChat);
 
 export default chatRoutes;

@@ -42,7 +42,7 @@ app.use(errorHandler);
 
     try {
         await connectDB();
-        app.listen(port, () => {
+        httpServer.listen(port, () => {
             console.log(`\x1b[34mMain app listening at http://localhost:${port}\x1b[0m`);
         });
     } catch (error) {
