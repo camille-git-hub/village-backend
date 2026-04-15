@@ -11,8 +11,6 @@ listingRoutes.get("/search-address", searchAddress);
 
 listingRoutes.post("/", verifyToken, createListing);
 
-listingRoutes.get("/:_id", getListingById);
-
 listingRoutes.get("/owner/:ownerId", getListingByOwnerId);
 
 listingRoutes.put("/:_id", verifyToken, updateListing);
@@ -24,5 +22,7 @@ listingRoutes.post('/:id/save', verifyToken, saveListing);
 listingRoutes.delete('/:id/save', verifyToken, unsaveListing);
 
 listingRoutes.get('/user/:userId/saved', verifyToken, getSavedListings);
+
+listingRoutes.get("/:_id", getListingById);
 
 export default listingRoutes;
