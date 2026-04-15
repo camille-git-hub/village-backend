@@ -45,7 +45,6 @@ import { User } from '../models/index.ts';
         try {
             const userId = req.user._id;
             const { participantId } = req.body;
-            //const { chatId } = req.params;
           
             if (!participantId) {
                 return res.status(400).json({ message: "Participant ID is required" });
@@ -156,7 +155,7 @@ import { User } from '../models/index.ts';
         try {
             const { chatId } = req.params;
             const userId = req.user._id;
-            
+
             const chat = await Chat.findById(chatId);
 
             if (!chat) {
