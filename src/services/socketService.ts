@@ -29,7 +29,7 @@ export const initializeSocket = (httpServer: HHTPServer) => {
             const secret = process.env.JWT_SECRET || 'your-secret-key';
             const decoded = jwt.verify(token, secret) as jwt.JwtPayload;
 
-            socket.data.userId = decoded._Id;
+            socket.data.userId = decoded._id;
             socket.data.email = decoded.email;
 
             next();
