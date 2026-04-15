@@ -12,17 +12,17 @@ chatRoutes.use(verifyToken);
 chatRoutes.get('/', getChats);
 
 // Create a new chat or get existing chat with a participant
-chatRoutes.post('/', createOrGetChat);
+chatRoutes.post('/', verifyToken, createOrGetChat);
 
 // Get a specific chat by ID
 chatRoutes.get('/:chatId', getChatById);
 
 // Send a message to a chat
-chatRoutes.post('/:chatId/messages', sendMessage);
+chatRoutes.post('/:chatId/messages', verifyToken, sendMessage);
 
 // Mark all messages in a chat as read
-chatRoutes.put('/:chatId/read', markAsRead);
+chatRoutes.put('/:chatId/read', verifyToken, markAsRead);
 
-chatRoutes.delete('/:chatId', deleteChat);
+chatRoutes.delete('/:chatId', verifyToken, deleteChat);
 
 export default chatRoutes;
