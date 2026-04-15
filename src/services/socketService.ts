@@ -29,7 +29,7 @@ export const initializeSocket = (httpServer: HHTPServer) => {
             const secret = process.env.JWT_SECRET || 'your-secret-key';
             const decoded = jwt.verify(token, secret) as jwt.JwtPayload;
 
-            socket.data.userId = decoded.userId;
+            socket.data.userId = decoded._Id;
             socket.data.email = decoded.email;
 
             next();
@@ -37,7 +37,7 @@ export const initializeSocket = (httpServer: HHTPServer) => {
             next(new Error('Authentication error'));
         }
     });
-    
+
     io.on('connection', (socket: Socket) => {
         console.log(`A user connected: ${socket.id}`);
         socket.on('user:register', (userId: string) => {
