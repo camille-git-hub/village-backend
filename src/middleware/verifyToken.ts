@@ -11,8 +11,15 @@ declare global {
 
 export const verifyToken: RequestHandler = (req, res, next) => {
     const secret = process.env.JWT_SECRET || 'your-secret-key';
-    const { accessToken } = req.cookies; // requires cookie-parser dependency
+    let accessToken = req.cookies?.accessToken; // requires cookie-parser dependency
 
+  if (!accessToken){
+    const authHeader = req.headers.authorization;
+    if (authHeader?.startsWith('Bearer ')) {
+      accessToken = authHeader.substring(7);
+    }
+  }
+  
   if (!accessToken)
     return next(new Error("Not authenticated", { cause: { status: 401 } }));
 
