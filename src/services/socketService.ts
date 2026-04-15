@@ -48,6 +48,7 @@ export const initializeSocket = (httpServer: HHTPServer) => {
     socket.on('message:send', (data) => {
         const { chatId, recipientId, message } = data; 
         const recipientSocketId = userSockets.get(recipientId);
+        const senderId = socket.data.userId;
 
         if (recipientSocketId) {
             io.to(recipientSocketId).emit('message:receive', { chatId, message });
@@ -56,6 +57,10 @@ export const initializeSocket = (httpServer: HHTPServer) => {
         }
 
             socket.emit('message:sent', { chatId, message });
+            if (recipientSocketId) {
+                io.to(recipientSocketId).emit('chat:updated', { chatId });
+                console.log(`Emitted chat:updated for chat ${chatId} to user ${recipientId}`);
+            }
         
         });
 

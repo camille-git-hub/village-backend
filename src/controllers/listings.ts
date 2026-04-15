@@ -2,6 +2,8 @@ import Listing from "../models/Listing.ts";
 import { response, type RequestHandler } from "express";
 import { getCoordinatesFromNeighborhood, HAMBURG_NEIGHBORHOODS } from "./../utils/neightborhoods.ts";
 import axios from "axios";
+import User from "../models/User.ts";
+
 
 export const searchAddress: RequestHandler = async (req, res, next) => {
     try {
@@ -183,4 +185,61 @@ export const deleteListing: RequestHandler = async (req, res, next) => {
     }
 };
 
-export default { getAllListings, createListing, getListingById, updateListing, deleteListing, getListingByOwnerId };
+export const saveListing: RequestHandler = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+        
+        // Add to user's savedListings
+        await User.findByIdAndUpdate(
+            userId,
+            { $addToSet: { savedListings: id } },
+            { new: true }
+        );
+        
+        // Add user to listing's savedBy
+        await Listing.findByIdAndUpdate(
+            id,
+            { $addToSet: { savedBy: userId } }
+        );
+        
+        res.status(200).json({ message: "Listing saved" });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const unsaveListing: RequestHandler = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user._id;
+        
+        await User.findByIdAndUpdate(
+            userId,
+            { $pull: { savedListings: id } }
+        );
+        
+        await Listing.findByIdAndUpdate(
+            id,
+            { $pull: { savedBy: userId } }
+        );
+        
+        res.status(200).json({ message: "Listing unsaved" });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getSavedListings: RequestHandler = async (req, res, next) => {
+    try {
+        const { userId } = req.params;
+        
+        const user = await User.findById(userId).populate('savedListings');
+        res.status(200).json({ data: user?.savedListings || [] });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+export default { getAllListings, createListing, getListingById, updateListing, deleteListing, getListingByOwnerId, saveListing, unsaveListing, getSavedListings };

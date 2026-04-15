@@ -28,7 +28,8 @@ const userSchema = new Schema(
         isActive: {
             type: Boolean,
             default: true
-        }
+        },
+        savedListings: [{ type: Schema.Types.ObjectId, ref: 'Listing' }]
     },
     {
         timestamps: true
