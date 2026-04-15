@@ -9,7 +9,6 @@ import chatRoutes from './routes/chatRoutes.ts';
 import http from 'http';
 import { errorHandler, notFoundHandler } from '#middleware';
 import { initializeSocket } from './services/socketService.ts';
-import { verifyToken } from '#middleware';
 
 
 console.log("Mongoose version:", mongoose.version);
@@ -18,7 +17,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const httpServer = http.createServer(app);
 
-const io = initializeSocket(httpServer);
+initializeSocket(httpServer);
 
 app.use(cors({ 
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173', 
@@ -31,7 +30,7 @@ app.use(cors({
 app.use(express.json(), cookieParser());
 
 app.use('/listings', listingRoutes);
-app.use('/chats', verifyToken, chatRoutes);
+app.use('/chats', chatRoutes);
 
 app.get('/', (req, res) => {
     res.json({
@@ -43,6 +42,7 @@ app.get('/', (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+const startServer = async () => {
     try {
         await connectDB();
         httpServer.listen(port, () => {
@@ -52,4 +52,7 @@ app.use(errorHandler);
     console.error(error);
     process.exit(1);
     }
+};
+
+startServer();
 

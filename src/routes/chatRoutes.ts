@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import { getChats, getChatById, createOrGetChat, sendMessage, markAsRead, deleteChat } from '../controllers/chats.ts';
+import { verifyToken } from '#middleware';
 
 const chatRoutes = Router();
+
+chatRoutes.use(verifyToken);
 
 chatRoutes.get('/', getChats);
 
