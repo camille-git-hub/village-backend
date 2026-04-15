@@ -9,6 +9,7 @@ import chatRoutes from './routes/chatRoutes.ts';
 import http from 'http';
 import { errorHandler, notFoundHandler } from '#middleware';
 import { initializeSocket } from './services/socketService.ts';
+import { verifyToken } from '#middleware';
 
 
 console.log("Mongoose version:", mongoose.version);
@@ -30,7 +31,7 @@ app.use(cors({
 app.use(express.json(), cookieParser());
 
 app.use('/listings', listingRoutes);
-app.use('/chats', chatRoutes);
+app.use('/chats', verifyToken, chatRoutes);
 
 app.get('/', (req, res) => {
     res.json({
