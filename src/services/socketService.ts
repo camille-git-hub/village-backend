@@ -1,5 +1,6 @@
 import { Server as HHTPServer } from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
+import jwt from 'jsonwebtoken';
 
 type UserSocket = {
     userId: string;
@@ -16,10 +17,30 @@ export const initializeSocket = (httpServer: HHTPServer) => {
         },
     });
 
+    io.use(async (socket, next) => {
+        const token = socket.handshake.auth.token;
+    
+        try {
+            const token = socket.handshake.auth.token;
 
-io.on('connection', (socket: Socket) => {
-    console.log(`A user connected: ${socket.id}`);
-    socket.on('user:register', (userId: string) => {
+            if (!token) {
+            return next(new Error('Authentication error: No token provided'));
+        }
+            const secret = process.env.JWT_SECRET || 'your-secret-key';
+            const decoded = jwt.verify(token, secret) as jwt.JwtPayload;
+
+            socket.data.userId = decoded.userId;
+            socket.data.email = decoded.email;
+
+            next();
+        } catch (error) {
+            next(new Error('Authentication error'));
+        }
+    });
+    
+    io.on('connection', (socket: Socket) => {
+        console.log(`A user connected: ${socket.id}`);
+        socket.on('user:register', (userId: string) => {
         userSockets.set(userId, socket.id);
         console.log(`Registered user ${userId} with socket ${socket.id}`);
     });
