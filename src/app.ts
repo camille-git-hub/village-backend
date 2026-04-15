@@ -20,9 +20,11 @@ const httpServer = http.createServer(app);
 const io = initializeSocket(httpServer);
 
 app.use(cors({ 
-    origin: process.env.CORS_ORIGIN, 
-    exposedHeaders: ['WWW-Authenticate'],
-    credentials: true
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173', 
+    exposedHeaders: ['WWW-Authenticate', 'Set-Cookie'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json(), cookieParser());
