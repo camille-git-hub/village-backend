@@ -2,8 +2,6 @@ import Listing from "../models/Listing.ts";
 import { response, type RequestHandler } from "express";
 import { getCoordinatesFromNeighborhood, HAMBURG_NEIGHBORHOODS } from "./../utils/neightborhoods.ts";
 import axios from "axios";
-import User from "../models/User.ts";
-
 
 export const searchAddress: RequestHandler = async (req, res, next) => {
     try {
@@ -187,59 +185,63 @@ export const deleteListing: RequestHandler = async (req, res, next) => {
 
 export const saveListing: RequestHandler = async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const { _id } = req.params;
         const userId = req.user._id;
+        const AUTH_URL = process.env.AUTH_URL || "http://localhost:4000";
+        console.log('Saving listing', _id, 'for user', userId); 
+
         
-        // Add to user's savedListings
-        await User.findByIdAndUpdate(
-            userId,
-            { $addToSet: { savedListings: id } },
-            { new: true }
-        );
-        
-        // Add user to listing's savedBy
         await Listing.findByIdAndUpdate(
-            id,
+            _id,
             { $addToSet: { savedBy: userId } }
         );
-        
+
+        const updatedUser = await fetch(`${AUTH_URL || "http://localhost:4000"}/users/${userId}/saved`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${req.headers.authorization?.split(' ')[1]}` },
+            body: JSON.stringify({ listingId: _id }),
+        });
+
+        if (!updatedUser.ok) {
+            console.log('Failed to update user saved listings:', updatedUser.statusText);
+            throw new Error('Failed to update user saved listings');
+        }
         res.status(200).json({ message: "Listing saved" });
     } catch (error) {
         next(error);
-    }
+    }   
 };
 
 export const unsaveListing: RequestHandler = async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const { _id } = req.params;
         const userId = req.user._id;
-        
-        await User.findByIdAndUpdate(
-            userId,
-            { $pull: { savedListings: id } }
-        );
+        const AUTH_URL = process.env.AUTH_URL || "http://localhost:4000";
+
+        console.log('Unsaving listing', _id, 'for user', userId);
         
         await Listing.findByIdAndUpdate(
-            id,
+            _id,
             { $pull: { savedBy: userId } }
         );
-        
+
+        const updatedUser = await fetch(`${AUTH_URL || "http://localhost:4000"}/users/${userId}/saved`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${req.headers.authorization?.split(' ')[1]}` },
+        });
+
+        if (!updatedUser.ok) {
+            console.log('Failed to update user saved listings:', updatedUser.statusText);
+            throw new Error('Failed to update user saved listings');
+        }
+
         res.status(200).json({ message: "Listing unsaved" });
     } catch (error) {
         next(error);
     }
 };
 
-export const getSavedListings: RequestHandler = async (req, res, next) => {
-    try {
-        const { userId } = req.params;
-        
-        const user = await User.findById(userId).populate('savedListings');
-        res.status(200).json({ data: user?.savedListings || [] });
-    } catch (error) {
-        next(error);
-    }
-};
 
-
-export default { getAllListings, createListing, getListingById, updateListing, deleteListing, getListingByOwnerId, saveListing, unsaveListing, getSavedListings };
+export default { getAllListings, createListing, getListingById, updateListing, deleteListing, getListingByOwnerId, saveListing, unsaveListing};
