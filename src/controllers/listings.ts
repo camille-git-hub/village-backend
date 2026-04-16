@@ -185,14 +185,14 @@ export const deleteListing: RequestHandler = async (req, res, next) => {
 
 export const saveListing: RequestHandler = async (req, res, next) => {
     try {
-        const { _id } = req.params;
+        const { id } = req.params;
         const userId = req.user._id;
         const AUTH_URL = process.env.AUTH_URL || "http://localhost:4000";
-        console.log('Saving listing', _id, 'for user', userId); 
+        console.log('Saving listing', id, 'for user', userId); 
 
         
         await Listing.findByIdAndUpdate(
-            _id,
+            id,
             { $addToSet: { savedBy: userId } }
         );
 
@@ -200,7 +200,7 @@ export const saveListing: RequestHandler = async (req, res, next) => {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${req.headers.authorization?.split(' ')[1]}` },
-            body: JSON.stringify({ listingId: _id }),
+            body: JSON.stringify({ listingId: id }),
         });
 
         if (!updatedUser.ok) {
@@ -215,21 +215,22 @@ export const saveListing: RequestHandler = async (req, res, next) => {
 
 export const unsaveListing: RequestHandler = async (req, res, next) => {
     try {
-        const { _id } = req.params;
+        const { id } = req.params;
         const userId = req.user._id;
         const AUTH_URL = process.env.AUTH_URL || "http://localhost:4000";
 
-        console.log('Unsaving listing', _id, 'for user', userId);
+        console.log('Unsaving listing', id, 'for user', userId);
         
         await Listing.findByIdAndUpdate(
-            _id,
+            id,
             { $pull: { savedBy: userId } }
         );
 
-        const updatedUser = await fetch(`${AUTH_URL || "http://localhost:4000"}/users/${userId}/saved`, {
+        const updatedUser = await fetch(`${AUTH_URL || "http://localhost:4000"}/users/${userId}/saved/${id}`, {
             method: 'DELETE',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${req.headers.authorization?.split(' ')[1]}` },
+            body: JSON.stringify({ listingId: id }),
         });
 
         if (!updatedUser.ok) {
