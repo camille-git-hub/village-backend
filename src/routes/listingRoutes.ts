@@ -5,17 +5,25 @@ import { verifyToken } from "#middleware";
 
 const listingRoutes = Router();
 
+//public routes
+
 listingRoutes.get("/", getAllListings);
 
 listingRoutes.get("/search-address", searchAddress);
 
+//protected routes
+
 listingRoutes.post("/", verifyToken, createListing);
+
+listingRoutes.get("/owner/:ownerId", getListingByOwnerId);
+
+//specific routes for saving/unsaving listings
 
 listingRoutes.post("/:id/save", verifyToken, saveListing);
 
 listingRoutes.delete("/:id/save", verifyToken, unsaveListing);
 
-listingRoutes.get("/owner/:ownerId", getListingByOwnerId);
+//generic routes for getting/updating/deleting listings by ID
 
 listingRoutes.get("/:_id", getListingById);
 
