@@ -22,6 +22,11 @@ const listingSchema = new Schema(
             required: [true, 'Neighborhood is required'],
             trim: true
         },
+        price: {
+            type: Number,
+            default: null,
+            min: [0, 'Price must be a positive number'],
+        },
         lat: {
             type: Number,
             default: null
