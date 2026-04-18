@@ -1,5 +1,5 @@
 import Listing from "../models/Listing.ts";
-import { response, type RequestHandler } from "express";
+import type { RequestHandler } from "express";
 import { getCoordinatesFromNeighborhood, HAMBURG_NEIGHBORHOODS } from "./../utils/neightborhoods.ts";
 import axios from "axios";
 
@@ -69,7 +69,7 @@ export const getAllListings: RequestHandler = async (req, res, next) => {
 
 export const createListing: RequestHandler = async (req, res, next) => {
     try {
-        const { title, category, description, neighborhood, lat, lng, address } = req.body;
+        const { title, category, description, neighborhood, lat, lng, address, price } = req.body;
 
         if (!title || !category || !description || !neighborhood ) {
             return res.status(400).json({ message: "Missing required fields" });
@@ -92,6 +92,7 @@ export const createListing: RequestHandler = async (req, res, next) => {
             address: address || '',
             lat: lat || 0,
             lng: lng || 0,
+            price: price || undefined,
             ownerId: req.user._id
         });
 
@@ -127,7 +128,7 @@ export const getListingByOwnerId: RequestHandler = async (req, res, next) => {
 export const updateListing: RequestHandler = async (req, res, next) => {
     try {
         const { _id } = req.params;
-        const { title, category, description, neighborhood, address, lat, lng } = req.body;
+        const { title, category, description, neighborhood, address, lat, lng, price } = req.body;
 
         const listing = await Listing.findById(_id);
         if (!listing) {
@@ -142,6 +143,7 @@ export const updateListing: RequestHandler = async (req, res, next) => {
         if (category) listing.category = category;
         if (description) listing.description = description;
         if (address !== undefined) listing.address = address;
+        if (price !== undefined) listing.price = price;
 
         if (neighborhood) {
             const coords = getCoordinatesFromNeighborhood(neighborhood);
