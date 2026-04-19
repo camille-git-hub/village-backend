@@ -6,6 +6,7 @@ export type Listing = {
   description: string;
   neighborhood: string;
   address: string;
+  price?: number;
   lat: number;
   lng: number;
   ownerId: string;
