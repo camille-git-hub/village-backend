@@ -12,6 +12,6 @@ export async function connectDB() {
   });
 
   console.log(
-    `Connected to MongoDB @ ${client.connection.host} - ${client.connection.name}`
+    `Connected to MongoDB database at ${client.connection.host}:${client.connection.port}`
   );
 }

@@ -190,7 +190,6 @@ export const saveListing: RequestHandler = async (req, res, next) => {
         const { id } = req.params;
         const userId = req.user._id;
         const AUTH_URL = process.env.AUTH_URL || "http://localhost:4000";
-        console.log('Saving listing', id, 'for user', userId); 
 
         
         await Listing.findByIdAndUpdate(
@@ -220,8 +219,6 @@ export const unsaveListing: RequestHandler = async (req, res, next) => {
         const { id } = req.params;
         const userId = req.user._id;
         const AUTH_URL = process.env.AUTH_URL || "http://localhost:4000";
-
-        console.log('Unsaving listing', id, 'for user', userId);
         
         await Listing.findByIdAndUpdate(
             id,
