@@ -18,7 +18,6 @@ export const initializeSocket = (httpServer: HHTPServer) => {
     });
 
     io.use(async (socket, next) => {
-        const token = socket.handshake.auth.token;
     
         try {
             const token = socket.handshake.auth.token;
@@ -39,10 +38,10 @@ export const initializeSocket = (httpServer: HHTPServer) => {
     });
 
     io.on('connection', (socket: Socket) => {
-        console.log(`A user connected: ${socket.id}`);
+        console.log(`A user connected`);
         socket.on('user:register', (userId: string) => {
         userSockets.set(userId, socket.id);
-        console.log(`Registered user ${userId} with socket ${socket.id}`);
+        console.log(`Registered user`);
     });
 
     socket.on('message:send', (data) => {
@@ -52,14 +51,14 @@ export const initializeSocket = (httpServer: HHTPServer) => {
 
         if (recipientSocketId) {
             io.to(recipientSocketId).emit('message:receive', { chatId, message });
-            console.log(`Sent message to user ${recipientId} in chat ${chatId}`);
+            console.log(`Sent message to user in chat ${chatId}`);
 
         }
 
             socket.emit('message:sent', { chatId, message });
             if (recipientSocketId) {
                 io.to(recipientSocketId).emit('chat:updated', { chatId });
-                console.log(`Emitted chat:updated for chat ${chatId} to user ${recipientId}`);
+                console.log(`Emitted chat:updated for chat ${chatId}`);
             }
         
         });
@@ -70,7 +69,7 @@ export const initializeSocket = (httpServer: HHTPServer) => {
 
             if (recipientSocketId) {
                 io.to(recipientSocketId).emit('typing:started', { chatId, senderName });
-                console.log(`User ${senderName} started typing in chat ${chatId}`);
+                console.log(`User started typing in chat ${chatId}`);
             }
         });
 
@@ -88,7 +87,7 @@ export const initializeSocket = (httpServer: HHTPServer) => {
             for (const [userId, socketId] of userSockets.entries()) {
                 if (socketId === socket.id) {
                     userSockets.delete(userId);
-                    console.log(`User ${userId} disconnected and removed from userSockets`);
+                    console.log(`User disconnected and removed from userSockets`);
                     break;
                 }
             }
